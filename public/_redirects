@@ -1,0 +1,6 @@
+/oidc-callback      /index.html  200
+/oidc-callback/     /index.html  200
+/post-auth          /index.html  200
+/signin             /index.html  200
+/logout             /index.html  200
+/*                  /index.html  200

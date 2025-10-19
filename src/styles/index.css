@@ -1,0 +1,10 @@
+/* Additional helpers layered on top of existing Tailwind in src/index.css */
+:root {
+  --rtx-anim-duration: 150ms;
+}
+
+* {
+  transition: color var(--rtx-anim-duration) ease, background-color var(--rtx-anim-duration) ease, opacity var(--rtx-anim-duration) ease, transform var(--rtx-anim-duration) ease;
+}
+
+.hover-lift:hover { transform: translateY(-1px); }
