@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, Stethoscope, UserPlus, Building2 } from "lucide-react";
 
-function Option({ icon: Icon, title, desc, onClick }) {
+function Option({ icon: Icon, title, desc, onClick, disabled }) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center gap-3">
@@ -18,7 +18,7 @@ function Option({ icon: Icon, title, desc, onClick }) {
         </div>
       </CardHeader>
       <CardContent>
-        <Button onClick={onClick} className="w-full">Continue</Button>
+        <Button onClick={onClick} className="w-full" disabled={disabled}>Continue</Button>
       </CardContent>
     </Card>
   );
@@ -26,18 +26,21 @@ function Option({ icon: Icon, title, desc, onClick }) {
 
 export default function RoleSelection() {
   const [saving, setSaving] = React.useState(false);
+  const [error, setError] = React.useState(null);
   const auth = useAuth();
 
   // OIDC: skip local user fetch, assume user is authenticated and needs to select role
 
-  const handleSelect = async (role) => {
+  const handleSelect = (role) => {
     if (saving) return;
     setSaving(true);
+    setError(null);
     try {
-      await saveRoleAndProceed(auth, role);
+      saveRoleAndProceed(auth, role);
+      // Navigation happens immediately via window.location.href, so no need to wait
     } catch (e) {
-      // If update fails, fallback to dashboard
-    } finally {
+      console.error("Failed to save role:", e);
+      setError("Failed to save your selection. Please try again.");
       setSaving(false);
     }
   };
@@ -58,24 +61,33 @@ export default function RoleSelection() {
             title="Prescriber"
             desc="For clinicians initiating requests"
             onClick={() => handleSelect("prescriber")}
+            disabled={saving}
           />
           <Option
             icon={UserPlus}
             title="Prescriber Staff"
             desc="For team members assisting prescribers"
             onClick={() => handleSelect("prescriber_staff")}
+            disabled={saving}
           />
           <Option
             icon={Building2}
             title="Pharmacy Staff"
             desc="For pharmacy users responding to requests"
             onClick={() => handleSelect("pharmacy_staff")}
+            disabled={saving}
           />
         </div>
 
         {saving && (
           <div className="flex items-center justify-center text-sm text-gray-600">
             <Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving your choice…
+          </div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md text-sm text-red-800 text-center">
+            {error}
           </div>
         )}
       </div>

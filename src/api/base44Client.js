@@ -18,7 +18,8 @@ export async function apiGet(path, opts = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "GET",
     headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-    credentials: "include",
+    // Avoid cross-origin credentialed requests unless API explicitly supports it
+    credentials: opts.credentials ?? "omit",
   });
   return handleJson(res);
 }
@@ -33,7 +34,8 @@ export async function apiPost(path, body = {}, opts = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-    credentials: "include",
+    // Avoid cross-origin credentialed requests unless API explicitly supports it
+    credentials: opts.credentials ?? "omit",
     body: JSON.stringify(body),
   });
   return handleJson(res);

@@ -7,6 +7,20 @@ if (typeof window !== "undefined") {
 
 import { ringNotification } from "@/components/utils/sounds";
 
+// Enable/disable SSE at runtime via Vite env. If not explicitly enabled,
+// default to enabling only on localhost to avoid Netlify 404/HTML responses.
+function isSseAllowed() {
+  if (typeof window === "undefined") return false;
+  // Respect explicit environment override
+  const flag = (import.meta.env && import.meta.env.VITE_SSE_ENABLED) || "";
+  const norm = String(flag).toLowerCase();
+  if (norm === "1" || norm === "true") return true;
+  if (norm === "0" || norm === "false") return false;
+  // Default behavior: allow on localhost only
+  const host = window.location?.hostname || "";
+  return host === "localhost" || host === "127.0.0.1";
+}
+
 let es = null;
 let connecting = false;
 let retryAt = 0;
@@ -84,6 +98,8 @@ export function setSseChannel(email) {
 
 export function ensureConnected() {
   const now = Date.now();
+  // Skip attempting to connect when SSE is not allowed (e.g., Netlify static site)
+  if (!isSseAllowed()) return;
   if (connecting) return;
 
   const ch = getChannel();
@@ -98,7 +114,7 @@ export function ensureConnected() {
     if (es) { try { es.close(); } catch (_e) {} es = null; }
     lastChannel = ch;
 
-    const base = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+  const base = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
     const url = `${base}/functions/events?ts=${Date.now()}&channel=${encodeURIComponent(ch)}`;
     try { console.log("[SSE] connecting:", url, "channel:", ch); } catch (_) {}
 

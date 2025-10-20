@@ -1,0 +1,23 @@
+ [build]
+   command = "npm ci && npm run build"
+   publish = "dist"
+
+ [[redirects]]
+   from = "/*"
+   to = "/index.html"
+   status = 200
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = '''
+      default-src 'self';
+      connect-src 'self' https://68gf4jsc6b.execute-api.us-east-1.amazonaws.com https://us-east-1e7jguoyub.auth.us-east-1.amazoncognito.com https://cognito-idp.us-east-1.amazonaws.com;
+      img-src 'self' data:;
+      style-src 'self' 'unsafe-inline';
+      script-src 'self';
+      frame-ancestors 'none';
+      base-uri 'self';
+    '''
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
