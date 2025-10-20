@@ -11,19 +11,24 @@ import '@/index.css'
 import '@/styles/index.css'
 import '@/lib/sounds'
 
-// In-memory user store to avoid localStorage/sessionStorage
-const memoryStore = (() => {
-        const store = Object.create(null);
-        const get = (key) => (store[key] === undefined ? null : store[key]);
-        const set = (key, value) => { store[key] = value; };
-        const remove = (key) => { delete store[key]; };
-        const getAllKeys = () => Object.keys(store);
-        return { get, set, remove, getItem: get, setItem: set, removeItem: remove, getAllKeys };
-})();
+// Persistent OIDC store: prefer real localStorage in the browser so tokens
+// survive the hosted UI redirect/callback. Fall back to an in-memory shim
+// when window.localStorage is unavailable (e.g. during SSR or tests).
+const storage = (typeof window !== 'undefined' && window.localStorage)
+        ? window.localStorage
+        : (() => {
+                        const store = Object.create(null);
+                        return {
+                                getItem: (k) => (store[k] === undefined ? null : store[k]),
+                                setItem: (k, v) => { store[k] = v; },
+                                removeItem: (k) => { delete store[k]; },
+                                getAllKeys: () => Object.keys(store),
+                        };
+                })();
 
 const oidcConfig = {
         ...cognitoAuthConfig,
-        userStore: new WebStorageStateStore({ store: memoryStore }),
+        userStore: new WebStorageStateStore({ store: storage }),
         automaticSilentRenew: false,
 };
 
