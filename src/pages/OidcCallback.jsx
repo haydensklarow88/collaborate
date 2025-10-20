@@ -9,10 +9,14 @@ export default function OidcCallback() {
   useEffect(() => {
     (async () => {
       try {
+        console.log("OidcCallback: Starting signinRedirectCallback...");
         await auth.signinRedirectCallback();
+        console.log("OidcCallback: signinRedirectCallback SUCCESS, navigating to /post-auth");
+        console.log("OidcCallback: auth.isAuthenticated =", auth.isAuthenticated);
+        console.log("OidcCallback: auth.user?.id_token exists?", !!auth.user?.id_token);
         nav("/post-auth", { replace: true });
       } catch (e) {
-        console.error(e);
+        console.error("OidcCallback: signinRedirectCallback FAILED:", e);
         nav("/signin", { replace: true });
       }
     })();

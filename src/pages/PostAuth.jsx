@@ -8,15 +8,29 @@ export default function PostAuth() {
   const nav = useNavigate();
   const [loading, setLoading] = useState(true);
 
+  console.log("PostAuth: Component MOUNTED");
+  console.log("PostAuth: auth.isLoading =", auth.isLoading);
+  console.log("PostAuth: auth.isAuthenticated =", auth.isAuthenticated);
+
   useEffect(() => {
-    if (auth.isLoading) return;
+    console.log("PostAuth: useEffect RUNNING");
+    console.log("PostAuth: auth.isLoading =", auth.isLoading);
+    console.log("PostAuth: auth.isAuthenticated =", auth.isAuthenticated);
+    
+    if (auth.isLoading) {
+      console.log("PostAuth: Still loading, exiting useEffect");
+      return;
+    }
+    
     if (!auth.isAuthenticated) {
+      console.log("PostAuth: Not authenticated, redirecting to /signin");
       nav("/signin", { replace: true });
       return;
     }
 
     const checkUserRole = async () => {
       try {
+        console.log("PostAuth: ========== checkUserRole START ==========");
         console.log("PostAuth: auth object:", auth);
         console.log("PostAuth: auth.user:", auth.user);
         console.log("PostAuth: auth.isAuthenticated:", auth.isAuthenticated);
@@ -32,6 +46,7 @@ export default function PostAuth() {
 
         // Try to fetch user profile from your API
         console.log("PostAuth: Calling /auth/me with Authorization header");
+        console.log("PostAuth: Authorization header value:", `Bearer ${idToken.substring(0, 20)}...`);
         const response = await apiGet("/auth/me", {
           headers: {
             "Authorization": `Bearer ${idToken}`
@@ -47,6 +62,7 @@ export default function PostAuth() {
 
         if (!role) {
           // No role saved yet, go to role selection
+          console.log("PostAuth: No role found, redirecting to RoleSelection");
           nav("/RoleSelection", { replace: true });
           return;
         }
@@ -59,10 +75,11 @@ export default function PostAuth() {
         };
 
         const targetRoute = roleRoutes[role] || "/Home";
+        console.log("PostAuth: Navigating to:", targetRoute);
         nav(targetRoute, { replace: true });
 
       } catch (error) {
-        console.error("Error fetching user role:", error);
+        console.error("PostAuth: ERROR in checkUserRole:", error);
         // On API error, assume no role and go to role selection
         nav("/RoleSelection", { replace: true });
       } finally {
