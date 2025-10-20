@@ -16,6 +16,12 @@ function App() {
 
   // Only run /me fetch and navigation after OIDC authentication
   useEffect(() => {
+    // Don't run on callback or post-auth pages - let those components handle the flow
+    if (location.pathname === '/oidc-callback' || location.pathname === '/post-auth') {
+      console.log("App.jsx: Skipping auth check on callback/post-auth page");
+      return;
+    }
+    
     if (!oidc || !oidc.isAuthenticated) return;
 
     let cancelled = false;

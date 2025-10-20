@@ -35,6 +35,12 @@ const oidcConfig = {
 // Run lightweight runtime diagnostics to catch redirect/host mismatches early
 try { checkCognitoRuntimeConfig() } catch {}
 
+// Debug: Log when the app loads
+console.log("=== main.jsx: App starting ===");
+console.log("Current URL:", window.location.href);
+console.log("Current pathname:", window.location.pathname);
+console.log("Is callback URL?", window.location.pathname.includes('oidc-callback'));
+
 ReactDOM.createRoot(document.getElementById('root')).render(
         <BrowserRouter>
                 <AuthProvider {...oidcConfig}>
