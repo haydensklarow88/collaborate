@@ -135,9 +135,9 @@ function makeEntityProxy(entityName) {
       // `me` is used by User.me()
       // return the raw user object (or null) to match callers that expect
       // `const me = await User.me()` and then read me.onboarding_complete
-      me: async () => {
+      me: async (opts = {}) => {
         if (!API_BASE) return null;
-        const res = await apiGet('/auth/me');
+        const res = await apiGet('/auth/me', opts);
         // apiGet returns { ok: true, data } on success
         return res && res.data ? res.data : null;
     },
@@ -171,9 +171,9 @@ const auth = {
     return auth.updateMe(payload);
   },
   // expose a minimal `me` for callers that import auth directly
-  me: async () => {
+  me: async (opts = {}) => {
     if (!API_BASE) return null;
-    const res = await apiGet('/auth/me');
+    const res = await apiGet('/auth/me', opts);
     return res?.data ?? null;
   }
 };

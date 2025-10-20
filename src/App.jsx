@@ -24,8 +24,17 @@ function App() {
         // First check localStorage for role (temporary until backend is wired)
         const storedRole = localStorage.getItem('userRole');
         
+        // Get ID token from OIDC and pass it to the API
+        const idToken = oidc.user?.id_token;
+        console.log("App.jsx: idToken exists?", !!idToken);
+        
         // Try to fetch from backend
-        const me = await User.me();
+        const me = await User.me({
+          headers: {
+            Authorization: idToken ? `Bearer ${idToken}` : undefined
+          }
+        });
+        console.log("App.jsx: User.me() response:", me);
         const role = me?.user_role || storedRole;
 
         // If onboarding not complete, force RoleSelection
