@@ -10,17 +10,31 @@ const API_BASE = import.meta.env.VITE_API_BASE || "";
  * Generic GET helper
  */
 export async function apiGet(path, opts = {}) {
+  console.log("apiGet called with path:", path);
+  console.log("apiGet API_BASE:", API_BASE);
+  console.log("apiGet opts:", opts);
+  
   if (!API_BASE) {
     // No backend configured — return a harmless placeholder.
     // Replace with real fetch once your backend is ready.
+    console.log("apiGet: No API_BASE configured, returning mock");
     return { ok: true, data: { message: "No backend configured yet." } };
   }
-  const res = await fetch(`${API_BASE}${path}`, {
+  
+  const url = `${API_BASE}${path}`;
+  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  
+  console.log("apiGet: Making fetch request to:", url);
+  console.log("apiGet: Headers:", headers);
+  
+  const res = await fetch(url, {
     method: "GET",
-    headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
+    headers,
     // Avoid cross-origin credentialed requests unless API explicitly supports it
     credentials: opts.credentials ?? "omit",
   });
+  
+  console.log("apiGet: Response status:", res.status);
   return handleJson(res);
 }
 

@@ -17,21 +17,33 @@ export default function PostAuth() {
 
     const checkUserRole = async () => {
       try {
+        console.log("PostAuth: auth object:", auth);
+        console.log("PostAuth: auth.user:", auth.user);
+        console.log("PostAuth: auth.isAuthenticated:", auth.isAuthenticated);
+        
         const idToken = auth.user?.id_token;
+        console.log("PostAuth: idToken:", idToken ? "EXISTS" : "NULL/UNDEFINED");
+        
         if (!idToken) {
+          console.log("PostAuth: No idToken found, redirecting to RoleSelection");
           nav("/RoleSelection", { replace: true });
           return;
         }
 
         // Try to fetch user profile from your API
+        console.log("PostAuth: Calling /auth/me with Authorization header");
         const response = await apiGet("/auth/me", {
           headers: {
             "Authorization": `Bearer ${idToken}`
           }
         });
 
+        console.log("PostAuth: API response:", response);
         const userData = response?.data;
         const role = userData?.role;
+
+        console.log("PostAuth: userData:", userData);
+        console.log("PostAuth: role:", role);
 
         if (!role) {
           // No role saved yet, go to role selection
